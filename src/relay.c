@@ -2,7 +2,7 @@
  * relay.c:
  *	Command-line interface to the Raspberry
  *	Pi's 4-Relay board.
- *	Copyright (c) 2016-2020 Sequent Microsystem
+ *	Copyright (c) 2016-2021 Sequent Microsystem
  *	<http://www.sequentmicrosystem.com>
  ***********************************************************************
  *	Author: Alexandru Burcea
@@ -156,6 +156,8 @@ char *usage = "Usage:	 4relplus -h <command>\n"
 	"         4relplus <id> write <value>\n"
 	"         4relplus <id> read <channel>\n"
 	"         4relplus <id> read\n"
+	"         4relplus <id> inread <channel>\n"
+	"         4relplus <id> inread\n"
 	"         4relplus <id> test\n"
 	"Where: <id> = Board level id = 0..7\n"
 	"Type 4relplus -h <command> for more help"; // No trailing newline needed here.
