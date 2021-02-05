@@ -22,7 +22,7 @@
 #define VERSION_MINOR	(int)0
 
 #define UNUSED(X) (void)X      /* To avoid gcc/g++ warnings */
-#define CMD_ARRAY_SIZE	7
+#define CMD_ARRAY_SIZE	8
 
 const u8 relayMaskRemap[RELAY_CH_NR_MAX] =
 {
