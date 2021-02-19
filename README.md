@@ -1,4 +1,4 @@
-[![4relay-rpi](readmeres/sequent.jpg)](https://www.sequentmicrosystems.com)
+[![4relind-rpi](readmeres/sequent.jpg)](https://www.sequentmicrosystems.com)
 
 # 4relplus-rpi
 
@@ -13,22 +13,22 @@ Don't forget to enable I2C communication:
 ## Usage
 
 ```bash
-~$ git clone https://github.com/SequentMicrosystems/4relplus-rpi.git
-~$ cd 4relplus-rpi/
-~/4relplus-rpi$ sudo make install
+~$ git clone https://github.com/SequentMicrosystems/4relind-rpi.git
+~$ cd 4relind-rpi/
+~/4relind-rpi$ sudo make install
 ```
 
 Now you can access all the functions of the relays board through the command "4relplus". Use -h option for help:
 ```bash
-~$ 4relplus -h
+~$ 4relind -h
 ```
 
 If you clone the repository any update can be made with the following commands:
 
 ```bash
-~$ cd 4relplus-rpi/  
-~/4relplus-rpi$ git pull
-~/4relplus-rpi$ sudo make install
+~$ cd 4relind-rpi/  
+~/4relind-rpi$ git pull
+~/4relind-rpi$ sudo make install
 ```  
 
 
