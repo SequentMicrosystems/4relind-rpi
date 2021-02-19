@@ -326,7 +326,7 @@ int inChGet(int dev, u8 channel, OutStateEnumType* state)
 		return ERROR;
 	}
 
-	if ((buff[0] & (1 << inMaskRemap[channel - 1])) == 0)
+	if ((buff[0] & (inMaskRemap[channel - 1])) == 0)
 	{
 		*state = ON;
 	}
