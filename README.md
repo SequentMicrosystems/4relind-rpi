@@ -1,6 +1,6 @@
 [![4relind-rpi](readmeres/sequent.jpg)](https://www.sequentmicrosystems.com)
 
-# 4relplus-rpi
+# 4relind-rpi
 
 
 This is the command to control [4-RELAYS-Plus Heavy Duty Stackable Card for Raspberry Pi](https://sequentmicrosystems.com)
