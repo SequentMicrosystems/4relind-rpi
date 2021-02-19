@@ -64,9 +64,9 @@ const CliCmdType CMD_HELP =
 		1,
 		&doHelp,
 		"\t-h          Display the list of command options or one command option details\n",
-		"\tUsage:      4relplus -h    Display command options list\n",
-		"\tUsage:      4relplus -h <param>   Display help for <param> command option\n",
-		"\tExample:    4relplus -h write    Display help for \"write\" command option\n"};
+		"\tUsage:      4relind -h    Display command options list\n",
+		"\tUsage:      4relind -h <param>   Display help for <param> command option\n",
+		"\tExample:    4relind -h write    Display help for \"write\" command option\n"};
 
 static void doVersion(int argc, char *argv[]);
 const CliCmdType CMD_VERSION =
@@ -75,9 +75,9 @@ const CliCmdType CMD_VERSION =
 	1,
 	&doVersion,
 	"\t-v              Display the version number\n",
-	"\tUsage:          4relplus -v\n",
+	"\tUsage:          4relind -v\n",
 	"",
-	"\tExample:        4relplus -v  Display the version number\n"};
+	"\tExample:        4relind -v  Display the version number\n"};
 
 static void doWarranty(int argc, char* argv[]);
 const CliCmdType CMD_WAR =
@@ -86,9 +86,9 @@ const CliCmdType CMD_WAR =
 	1,
 	&doWarranty,
 	"\t-warranty       Display the warranty\n",
-	"\tUsage:          4relplus -warranty\n",
+	"\tUsage:          4relind -warranty\n",
 	"",
-	"\tExample:        4relplus -warranty  Display the warranty text\n"};
+	"\tExample:        4relind -warranty  Display the warranty text\n"};
 
 static void doList(int argc, char *argv[]);
 const CliCmdType CMD_LIST =
@@ -96,10 +96,10 @@ const CliCmdType CMD_LIST =
 		"-list",
 		1,
 		&doList,
-		"\t-list:       List all 4relplus boards connected,\n\treturn       nr of boards and stack level for every board\n",
-		"\tUsage:       4relplus -list\n",
+		"\t-list:       List all 4relind boards connected,\n\treturn       nr of boards and stack level for every board\n",
+		"\tUsage:       4relind -list\n",
 		"",
-		"\tExample:     4relplus -list display: 1,0 \n"};
+		"\tExample:     4relind -list display: 1,0 \n"};
 
 static void doRelayWrite(int argc, char *argv[]);
 const CliCmdType CMD_WRITE =
@@ -108,9 +108,9 @@ const CliCmdType CMD_WRITE =
 	2,
 	&doRelayWrite,
 	"\twrite:       Set relays On/Off\n",
-	"\tUsage:       4relplus <id> write <channel> <on/off>\n",
-	"\tUsage:       4relplus <id> write <value>\n",
-	"\tExample:     4relplus 0 write 2 On; Set Relay #2 on Board #0 On\n"};
+	"\tUsage:       4relind <id> write <channel> <on/off>\n",
+	"\tUsage:       4relind <id> write <value>\n",
+	"\tExample:     4relind 0 write 2 On; Set Relay #2 on Board #0 On\n"};
 
 static void doRelayRead(int argc, char *argv[]);
 const CliCmdType CMD_READ =
@@ -119,9 +119,9 @@ const CliCmdType CMD_READ =
 	2,
 	&doRelayRead,
 	"\tread:        Read relays status\n",
-	"\tUsage:       4relplus <id> read <channel>\n",
-	"\tUsage:       4relplus <id> read\n",
-	"\tExample:     4relplus 0 read 2; Read Status of Relay #2 on Board #0\n"};
+	"\tUsage:       4relind <id> read <channel>\n",
+	"\tUsage:       4relind <id> read\n",
+	"\tExample:     4relind 0 read 2; Read Status of Relay #2 on Board #0\n"};
 
 static void doInRead(int argc, char *argv[]);
 const CliCmdType CMD_IN_READ =
@@ -130,9 +130,9 @@ const CliCmdType CMD_IN_READ =
 	2,
 	&doInRead,
 	"\tinread:        Read inputs status\n",
-	"\tUsage:       4relplus <id> inread <channel>\n",
-	"\tUsage:       4relplus <id> inread\n",
-	"\tExample:     4relplus 0 inread 2; Read Status of Input #2 on Board #0\n"};
+	"\tUsage:       4relind <id> inread <channel>\n",
+	"\tUsage:       4relind <id> inread\n",
+	"\tExample:     4relind 0 inread 2; Read Status of Input #2 on Board #0\n"};
 
 
 static void doTest(int argc, char* argv[]);
@@ -143,24 +143,24 @@ const CliCmdType CMD_TEST =
 	&doTest,
 	"\ttest:        Turn ON and OFF the relays until press a key\n",
 	"",
-	"\tUsage:       4relplus <id> test\n",
-	"\tExample:     4relplus 0 test\n"};
+	"\tUsage:       4relind <id> test\n",
+	"\tExample:     4relind 0 test\n"};
 
 CliCmdType gCmdArray[CMD_ARRAY_SIZE];
 
-char *usage = "Usage:	 4relplus -h <command>\n"
-	"         4relplus -v\n"
-	"         4relplus -warranty\n"
-	"         4relplus -list\n"
-	"         4relplus <id> write <channel> <on/off>\n"
-	"         4relplus <id> write <value>\n"
-	"         4relplus <id> read <channel>\n"
-	"         4relplus <id> read\n"
-	"         4relplus <id> inread <channel>\n"
-	"         4relplus <id> inread\n"
-	"         4relplus <id> test\n"
+char *usage = "Usage:	 4relind -h <command>\n"
+	"         4relind -v\n"
+	"         4relind -warranty\n"
+	"         4relind -list\n"
+	"         4relind <id> write <channel> <on/off>\n"
+	"         4relind <id> write <value>\n"
+	"         4relind <id> read <channel>\n"
+	"         4relind <id> read\n"
+	"         4relind <id> inread <channel>\n"
+	"         4relind <id> inread\n"
+	"         4relind <id> test\n"
 	"Where: <id> = Board level id = 0..7\n"
-	"Type 4relplus -h <command> for more help"; // No trailing newline needed here.
+	"Type 4relind -h <command> for more help"; // No trailing newline needed here.
 
 char *warranty =
 	"	       Copyright (c) 2016-2020 Sequent Microsystems\n"
@@ -432,8 +432,8 @@ static void doRelayWrite(int argc, char *argv[])
 
 	if ( (argc != 5) && (argc != 4))
 	{
-		printf("Usage: 4relplus <id> write <relay number> <on/off> \n");
-		printf("Usage: 4relplus <id> write <relay reg value> \n");
+		printf("Usage: 4relind <id> write <relay number> <on/off> \n");
+		printf("Usage: 4relind <id> write <relay reg value> \n");
 		exit(1);
 	}
 
@@ -675,10 +675,10 @@ static void doVersion(int argc, char *argv[])
 {
 	UNUSED(argc);
 	UNUSED(argv);
-	printf("4relplus v%d.%d.%d Copyright (c) 2016 - 2021 Sequent Microsystems\n",
+	printf("4relind v%d.%d.%d Copyright (c) 2016 - 2021 Sequent Microsystems\n",
 	VERSION_BASE, VERSION_MAJOR, VERSION_MINOR);
 	printf("\nThis is free software with ABSOLUTELY NO WARRANTY.\n");
-	printf("For details type: 4relplus -warranty\n");
+	printf("For details type: 4relind -warranty\n");
 
 }
 
