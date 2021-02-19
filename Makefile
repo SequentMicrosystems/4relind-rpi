@@ -15,9 +15,9 @@ SRC	=	src/relay.c src/comm.c src/thread.c
 
 OBJ	=	$(SRC:.c=.o)
 
-all:	4relplus
+all:	4relind
 
-4relplus:	$(OBJ)
+4relind:	$(OBJ)
 	$Q echo [Link]
 	$Q $(CC) -o $@ $(OBJ) $(LDFLAGS) $(LIBS)
 
@@ -28,15 +28,15 @@ all:	4relplus
 .PHONY:	clean
 clean:
 	$Q echo "[Clean]"
-	$Q rm -f $(OBJ) 4relplus *~ core tags *.bak
+	$Q rm -f $(OBJ) 4relind *~ core tags *.bak
 
 .PHONY:	install
-install: 4relplus
+install: 4relind
 	$Q echo "[Install]"
-	$Q cp 4relplus		$(DESTDIR)$(PREFIX)/bin
+	$Q cp 4relind		$(DESTDIR)$(PREFIX)/bin
 ifneq ($(WIRINGPI_SUID),0)
-	$Q chown root.root	$(DESTDIR)$(PREFIX)/bin/4relplus
-	$Q chmod 4755		$(DESTDIR)$(PREFIX)/bin/4relplus
+	$Q chown root.root	$(DESTDIR)$(PREFIX)/bin/4relind
+	$Q chmod 4755		$(DESTDIR)$(PREFIX)/bin/4relind
 endif
 #	$Q mkdir -p		$(DESTDIR)$(PREFIX)/man/man1
 #	$Q cp megaio.1		$(DESTDIR)$(PREFIX)/man/man1
@@ -44,5 +44,5 @@ endif
 .PHONY:	uninstall
 uninstall:
 	$Q echo "[UnInstall]"
-	$Q rm -f $(DESTDIR)$(PREFIX)/bin/4relplus
-	$Q rm -f $(DESTDIR)$(PREFIX)/man/man1/4relplus.1
+	$Q rm -f $(DESTDIR)$(PREFIX)/bin/4relind
+	$Q rm -f $(DESTDIR)$(PREFIX)/man/man1/4relind.1
