@@ -3,26 +3,26 @@
 # 4relind-rpi
 
 
-This is the command to control [4-RELAYS-Plus Heavy Duty Stackable Card for Raspberry Pi](https://sequentmicrosystems.com)
+This is the command to control [Four Relays four Inputs 8-Layer Stackable Card for Raspberry Pi](https://sequentmicrosystems.com/collections/all-io-cards/products/raspberry-pi-relays-heavy-duty-hat)
 
 Don't forget to enable I2C communication:
 ```bash
 ~$ sudo raspi-config
 ```
 
-## Usage
+## Install
 
 ```bash
 ~$ git clone https://github.com/SequentMicrosystems/4relind-rpi.git
 ~$ cd 4relind-rpi/
 ~/4relind-rpi$ sudo make install
 ```
-
-Now you can access all the functions of the relays board through the command "4relplus". Use -h option for help:
+## Usage
+Now you can access all the functions of the card through the command "4relind". Use -h option for help:
 ```bash
 ~$ 4relind -h
 ```
-
+## Update
 If you clone the repository any update can be made with the following commands:
 
 ```bash
@@ -31,4 +31,8 @@ If you clone the repository any update can be made with the following commands:
 ~/4relind-rpi$ sudo make install
 ```  
 
-
+Diferent software interfaces and examples are available:
+* [Python Library](https://github.com/SequentMicrosystems/4relind-rpi/tree/main/python)
+* [Python Example](https://github.com/SequentMicrosystems/4relind-rpi/blob/main/python/tests.py)
+* [Node-Red Nodes](https://github.com/SequentMicrosystems/4relind-rpi/tree/main/node-red-contrib-sm-4relind) 
+* [Node-Red Example](https://github.com/SequentMicrosystems/4relind-rpi/tree/main/node-red-contrib-sm-4relind/example)
