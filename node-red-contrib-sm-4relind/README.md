@@ -1,3 +1,5 @@
+[![4relind-rpi](../readmeres/sequent.jpg)](https://sequentmicrosystems.com)
+
 # node-red-contrib-sm-4relind
 
 This is the node-red node to control Sequent Microsystems [Four Relays four Inputs 8-Layer Stackable Card for Raspberry Pi](https://sequentmicrosystems.com/collections/all-io-cards/products/raspberry-pi-relays-heavy-duty-hat).
