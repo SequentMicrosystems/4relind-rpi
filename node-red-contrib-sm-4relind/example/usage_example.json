@@ -1,0 +1,17 @@
+[
+    {
+        "id": "b6129a12.719678",
+        "type": "4relind",
+        "z": "8053da30.9f5288",
+        "name": "",
+        "stack": "0",
+        "relay": "1",
+        "payload": "payload",
+        "payloadType": "msg",
+        "x": 530,
+        "y": 100,
+        "wires": [
+            []
+        ]
+    }
+]
