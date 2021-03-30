@@ -1,6 +1,6 @@
-[![4relayind-rpi](../readmeres/sequent.jpg)](https://sequentmicrosystems.com)
+[![4relind-rpi](../readmeres/sequent.jpg)](https://sequentmicrosystems.com)
 
-# lib4relayind
+# lib4relind
 
 This is the python library to control the [4-RELAYS Heavy Duty Stackable Card for Raspberry Pi](https://sequentmicrosystems.com/product/raspberry-pi-relays-heavy-duty-hat/).
 
