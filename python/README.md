@@ -13,6 +13,17 @@ This is the python library to control the [Four Relays four Inputs 8-Layer Stack
 ~$ cd 4relind-rpi/python/4relind/
 ~/4relind-rpi/python/4relind$ sudo python setup.py install
 ```
+
+If you use python3:
+```bash
+~$ sudo apt-get update
+~$ sudo apt-get install build-essential python3-pip python3-dev python3-smbus git
+~$ git clone https://github.com/SequentMicrosystems/4relind-rpi.git
+~$ cd 4relind-rpi/python/4relind/
+~/4relind-rpi/python/4relind$ sudo python3 setup.py install
+```
+
+
 ## Update
 
 ```bash
@@ -20,6 +31,14 @@ This is the python library to control the [Four Relays four Inputs 8-Layer Stack
 ~/4relind-rpi$ git pull
 ~$ cd 4relind-rpi/python/4relind/
 ~/4relind-rpi/python/4relind$ sudo python setup.py install
+```
+
+If you use python3:
+```bash
+~$ cd 4relind-rpi/
+~/4relind-rpi$ git pull
+~$ cd 4relind-rpi/python/4relind/
+~/4relind-rpi/python/4relind$ sudo python3 setup.py install
 ```
 
 ## Usage 
