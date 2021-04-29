@@ -66,7 +66,8 @@ def set_relay(stack, relay, value):
         raise ValueError('Invalid relay number')
 
     bus = smbus.SMBus(1)
-    stack = 0x07 ^ stack
+    st = (stack & 0x02) + (0x01 & (stack >> 2)) + (0x04 & (stack << 2))
+    stack = 0x07 ^ st
     try:
         oldVal = __check(bus, DEVICE_ADDRESS + stack)
         oldVal = __IOToRelay(oldVal)
@@ -87,7 +88,8 @@ def set_relay(stack, relay, value):
 def set_relay_all(stack, value):
     if stack < 0 or stack > 7:
         raise ValueError('Invalid stack level')
-    stack = 0x07 ^ stack
+    st = (stack & 0x02) + (0x01 & (stack >> 2)) + (0x04 & (stack << 2))
+    stack = 0x07 ^ st
     if value > 15:
         raise ValueError('Invalid relay value')
     if value < 0:
@@ -107,7 +109,8 @@ def set_relay_all(stack, value):
 def get_relay(stack, relay):
     if stack < 0 or stack > 7:
         raise ValueError('Invalid stack level')
-    stack = 0x07 ^ stack
+    st = (stack & 0x02) + (0x01 & (stack >> 2)) + (0x04 & (stack << 2))
+    stack = 0x07 ^ st
     if relay < 1:
         raise ValueError('Invalid relay number')
     if relay > 4:
@@ -130,7 +133,8 @@ def get_relay_all(stack):
     if stack < 0 or stack > 7:
         raise ValueError('Invalid stack level')
     bus = smbus.SMBus(1)
-    stack = 0x07 ^ stack
+    st = (stack & 0x02) + (0x01 & (stack >> 2)) + (0x04 & (stack << 2))
+    stack = 0x07 ^ st
     try:
         val = __check(bus, DEVICE_ADDRESS + stack)
         bus.close()
@@ -144,7 +148,8 @@ def get_relay_all(stack):
 def get_opto(stack, channel):
     if stack < 0 or stack > 7:
         raise ValueError('Invalid stack level')
-    stack = 0x07 ^ stack
+    st = (stack & 0x02) + (0x01 & (stack >> 2)) + (0x04 & (stack << 2))
+    stack = 0x07 ^ st
     if channel < 1:
         raise ValueError('Invalid opto channel number')
     if channel > 4:
@@ -167,7 +172,8 @@ def get_opto_all(stack):
     if stack < 0 or stack > 7:
         raise ValueError('Invalid stack level')
     bus = smbus.SMBus(1)
-    stack = 0x07 ^ stack
+    st = (stack & 0x02) + (0x01 & (stack >> 2)) + (0x04 & (stack << 2))
+    stack = 0x07 ^ st
     try:
         val = __check(bus, DEVICE_ADDRESS + stack)
         bus.close()
