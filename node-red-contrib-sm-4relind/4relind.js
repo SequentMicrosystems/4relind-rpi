@@ -54,7 +54,8 @@ module.exports = function(RED) {
               stack = 7;
             }
             //check the type of io_expander
-            hwAdd += stack ^ 0x07;
+            var st = (stack & 0x02) + (0x01 & (stack >> 2)) + (0x04 & (stack << 2));
+            hwAdd += st ^ 0x07;
             var direction = 0xaa;
             try{
                 direction = node.port.readByteSync(hwAdd, CFG_REG );
@@ -70,7 +71,7 @@ module.exports = function(RED) {
                 } else if (this.payloadType == 'none') {
                     myPayload = null;
                 } else {
-                    myPayload = RED.util.evaluateNodeProperty(this.payload, this.payloadType, this,msg);
+                    myPayload = RED.util.evaluateNodeProperty(this.payload, this.payloadType, this.msg);
                 }
                 if(direction != 0x0f){
                     node.port.writeByteSync(hwAdd, OUT_REG, 0x00);
@@ -165,7 +166,8 @@ module.exports = function(RED) {
               stack = 7;
             }
             //check the type of io_expander
-            hwAdd += stack ^ 0x07;
+            var st = (stack & 0x02) + (0x01 & (stack >> 2)) + (0x04 & (stack << 2));
+            hwAdd += st ^ 0x07;
             var direction = 0xaa;
             try{
                 direction = node.port.readByteSync(hwAdd, CFG_REG );
@@ -181,7 +183,7 @@ module.exports = function(RED) {
                 } else if (this.payloadType == 'none') {
                     myPayload = null;
                 } else {
-                    myPayload = RED.util.evaluateNodeProperty(this.payload, this.payloadType, this,msg);
+                    myPayload = RED.util.evaluateNodeProperty(this.payload, this.payloadType, this.msg);
                 }
                 
                 if(direction != 0x0f){
@@ -268,7 +270,8 @@ module.exports = function(RED) {
               stack = 7;
             }
             //check the type of io_expander
-            hwAdd += stack ^ 0x07;
+            var st = (stack & 0x02) + (0x01 & (stack >> 2)) + (0x04 & (stack << 2));
+            hwAdd += st ^ 0x07;
             var direction = 0xaa;
             try{
                 direction = node.port.readByteSync(hwAdd, CFG_REG );
@@ -284,7 +287,7 @@ module.exports = function(RED) {
                 } else if (this.payloadType == 'none') {
                     myPayload = null;
                 } else {
-                    myPayload = RED.util.evaluateNodeProperty(this.payload, this.payloadType, this,msg);
+                    myPayload = RED.util.evaluateNodeProperty(this.payload, this.payloadType, this.msg);
                 }
                 
                 if(direction != 0x0f){
