@@ -71,7 +71,7 @@ module.exports = function(RED) {
                 } else if (this.payloadType == 'none') {
                     myPayload = null;
                 } else {
-                    myPayload = RED.util.evaluateNodeProperty(this.payload, this.payloadType, this.msg);
+                    myPayload = RED.util.evaluateNodeProperty(this.payload, this.payloadType, this,msg);
                 }
                 if(direction != 0x0f){
                     node.port.writeByteSync(hwAdd, OUT_REG, 0x00);
@@ -183,7 +183,7 @@ module.exports = function(RED) {
                 } else if (this.payloadType == 'none') {
                     myPayload = null;
                 } else {
-                    myPayload = RED.util.evaluateNodeProperty(this.payload, this.payloadType, this.msg);
+                    myPayload = RED.util.evaluateNodeProperty(this.payload, this.payloadType, this,msg);
                 }
                 
                 if(direction != 0x0f){
@@ -287,7 +287,7 @@ module.exports = function(RED) {
                 } else if (this.payloadType == 'none') {
                     myPayload = null;
                 } else {
-                    myPayload = RED.util.evaluateNodeProperty(this.payload, this.payloadType, this.msg);
+                    myPayload = RED.util.evaluateNodeProperty(this.payload, this.payloadType, this,msg);
                 }
                 
                 if(direction != 0x0f){
