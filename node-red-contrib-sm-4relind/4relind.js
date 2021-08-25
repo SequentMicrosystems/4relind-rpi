@@ -54,7 +54,7 @@ module.exports = function(RED) {
               stack = 7;
             }
             //check the type of io_expander
-            var st = (stack & 0x02) + (0x01 & (stack >> 2)) + (0x04 & (stack << 2));
+            var st = stack;// for hw ver < 1.1(stack & 0x02) + (0x01 & (stack >> 2)) + (0x04 & (stack << 2));
             hwAdd += st ^ 0x07;
             var direction = 0xaa;
             try{
@@ -166,7 +166,7 @@ module.exports = function(RED) {
               stack = 7;
             }
             //check the type of io_expander
-            var st = (stack & 0x02) + (0x01 & (stack >> 2)) + (0x04 & (stack << 2));
+            var st = stack;// for hw ver < 1.1(stack & 0x02) + (0x01 & (stack >> 2)) + (0x04 & (stack << 2));
             hwAdd += st ^ 0x07;
             var direction = 0xaa;
             try{
@@ -270,7 +270,7 @@ module.exports = function(RED) {
               stack = 7;
             }
             //check the type of io_expander
-            var st = (stack & 0x02) + (0x01 & (stack >> 2)) + (0x04 & (stack << 2));
+            var st = stack;// for hw ver < 1.1(stack & 0x02) + (0x01 & (stack >> 2)) + (0x04 & (stack << 2));
             hwAdd += st ^ 0x07;
             var direction = 0xaa;
             try{
