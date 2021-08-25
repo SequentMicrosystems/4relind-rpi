@@ -366,7 +366,7 @@ int doBoardInit(int stack)
 		printf("Invalid stack level [0..7]!");
 		return ERROR;
 	}
-	st = (stack & 0x02) + (0x01 & (stack >> 2)) + (0x04 & (stack << 2));
+	st =  stack;//for hw versions less than 1.1 (stack & 0x02) + (0x01 & (stack >> 2)) + (0x04 & (stack << 2));
 	add = (st + RELAY8_HW_I2C_BASE_ADD) ^ 0x07;
 	dev = i2cSetup(add);
 	if (dev == -1)
@@ -694,7 +694,7 @@ static void doList(int argc, char *argv[])
 
 	for (i = 0; i < 8; i++)
 	{
-		st = (0x02 & i) + (0x01 & (i >> 2)) + (0x04 & (i << 2));
+		st = i;//for hw versions less than 1.1 (0x02 & i) + (0x01 & (i >> 2)) + (0x04 & (i << 2));
 		if (boardCheck(RELAY8_HW_I2C_BASE_ADD + st) == OK)
 		{
 			ids[cnt] = i;
