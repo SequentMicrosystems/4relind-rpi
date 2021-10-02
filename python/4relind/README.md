@@ -1,4 +1,4 @@
-[![4relayind-rpi](../readmeres/sequent.jpg)](https://sequentmicrosystems.com)
+[![4relayind-rpi](../../readmeres/sequent.jpg)](https://sequentmicrosystems.com)
 
 # lib4relayind
 
