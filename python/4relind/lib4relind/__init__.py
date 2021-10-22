@@ -3,6 +3,7 @@ import smbus
 # bus = smbus.SMBus(1)    # 0 = /dev/i2c-0 (port I2C0), 1 = /dev/i2c-1 (port I2C1)
 
 DEVICE_ADDRESS = 0x38  # 7 bit address (will be left shifted to add the read write bit)
+ALTERNATE_DEVICE_ADDRESS = 0x20 
 
 RELAY4_INPORT_REG_ADD = 0x00
 RELAY4_OUTPORT_REG_ADD = 0x01
@@ -54,31 +55,39 @@ def __check(bus, add):
         bus.write_byte_data(add, RELAY4_OUTPORT_REG_ADD, 0)
     return bus.read_byte_data(add, RELAY4_INPORT_REG_ADD)
 
-
-def set_relay(stack, relay, value):
+def __ident(bus, stack):
     if stack < 0 or stack > 7:
         raise ValueError('Invalid stack level')
-
-    if relay < 1:
-        raise ValueError('Invalid relay number')
-
-    if relay > 4:
-        raise ValueError('Invalid relay number')
-
-    bus = smbus.SMBus(1)
     st = stack #for hw versions less than 1.1 (stack & 0x02) + (0x01 & (stack >> 2)) + (0x04 & (stack << 2))
     stack = 0x07 ^ st
+    hwAdd = DEVICE_ADDRESS + stack
     try:
-        oldVal = __check(bus, DEVICE_ADDRESS + stack)
+         oldVal = __check(bus, hwAdd)
+    except Exception as e:
+        hwAdd = ALTERNATE_DEVICE_ADDRESS + stack
+        try:
+            oldVal = __check(bus, hwAdd)
+        except Exception as e:    
+            bus.close()
+            raise RuntimeError("Unable to communicate with 4relind with exception " + str(e))
+    return hwAdd, oldVal        
+
+
+def set_relay(stack, relay, value): 
+    if relay < 1 or relay > 4:
+        raise ValueError('Invalid relay number')
+    bus = smbus.SMBus(1)
+    hwAdd, oldVal = __ident(bus, stack)
+    try:
         oldVal = __IOToRelay(oldVal)
         if value == 0:
             oldVal = oldVal & (~(1 << (relay - 1)))
             oldVal = __relayToIO(oldVal)
-            bus.write_byte_data(DEVICE_ADDRESS + stack, RELAY4_OUTPORT_REG_ADD, oldVal)
+            bus.write_byte_data(hwAdd, RELAY4_OUTPORT_REG_ADD, oldVal)
         else:
             oldVal = oldVal | (1 << (relay - 1))
             oldVal = __relayToIO(oldVal)
-            bus.write_byte_data(DEVICE_ADDRESS + stack, RELAY4_OUTPORT_REG_ADD, oldVal)
+            bus.write_byte_data(hwAdd, RELAY4_OUTPORT_REG_ADD, oldVal)
     except Exception as e:
         bus.close()
         raise RuntimeError("Unable to communicate with 4relind with exception " + str(e))
@@ -86,20 +95,11 @@ def set_relay(stack, relay, value):
 
 
 def set_relay_all(stack, value):
-    if stack < 0 or stack > 7:
-        raise ValueError('Invalid stack level')
-    st = stack #for hw versions less than 1.1 (stack & 0x02) + (0x01 & (stack >> 2)) + (0x04 & (stack << 2))
-    stack = 0x07 ^ st
-    if value > 15:
-        raise ValueError('Invalid relay value')
-    if value < 0:
-        raise ValueError('Invalid relay value')
-
     bus = smbus.SMBus(1)
+    hwAdd, oldVal = __ident(bus, stack)
     try:
-        oldVal = __check(bus, DEVICE_ADDRESS + stack)
         value = __relayToIO(value)
-        bus.write_byte_data(DEVICE_ADDRESS + stack, RELAY4_OUTPORT_REG_ADD, value)
+        bus.write_byte_data(hwAdd, RELAY4_OUTPORT_REG_ADD, value)
     except Exception as e:
         bus.close()
         raise RuntimeError("Unable to communicate with 4relind with exception " + str(e))
@@ -107,21 +107,11 @@ def set_relay_all(stack, value):
 
 
 def get_relay(stack, relay):
-    if stack < 0 or stack > 7:
-        raise ValueError('Invalid stack level')
-    st = stack #for hw versions less than 1.1 (stack & 0x02) + (0x01 & (stack >> 2)) + (0x04 & (stack << 2))
-    stack = 0x07 ^ st
-    if relay < 1:
-        raise ValueError('Invalid relay number')
-    if relay > 4:
+    if relay < 1 or relay > 4:
         raise ValueError('Invalid relay number')
     bus = smbus.SMBus(1)
-    try:
-        val = __check(bus, DEVICE_ADDRESS + stack)
-        bus.close()
-    except Exception as e:
-        bus.close()
-        raise RuntimeError("Unable to communicate with 4relind with exception " + str(e))
+    hwAdd, val = __ident(bus, stack)
+    bus.close()
     val = __IOToRelay(val)
     val = val & (1 << (relay - 1))
     if val == 0:
@@ -130,37 +120,19 @@ def get_relay(stack, relay):
 
 
 def get_relay_all(stack):
-    if stack < 0 or stack > 7:
-        raise ValueError('Invalid stack level')
     bus = smbus.SMBus(1)
-    st = stack #for hw versions less than 1.1 (stack & 0x02) + (0x01 & (stack >> 2)) + (0x04 & (stack << 2))
-    stack = 0x07 ^ st
-    try:
-        val = __check(bus, DEVICE_ADDRESS + stack)
-        bus.close()
-    except Exception as e:
-        bus.close()
-        raise RuntimeError("Unable to communicate with 4relind with exception " + str(e))
+    hwAdd, val = __ident(bus, stack)
+    bus.close()
     val = __IOToRelay(val)
     return val
 
 
 def get_opto(stack, channel):
-    if stack < 0 or stack > 7:
-        raise ValueError('Invalid stack level')
-    st = stack #for hw versions less than 1.1 (stack & 0x02) + (0x01 & (stack >> 2)) + (0x04 & (stack << 2))
-    stack = 0x07 ^ st
-    if channel < 1:
-        raise ValueError('Invalid opto channel number')
-    if channel > 4:
+    if channel < 1 or channel > 4:
         raise ValueError('Invalid opto channel number')
     bus = smbus.SMBus(1)
-    try:
-        val = __check(bus, DEVICE_ADDRESS + stack)
-        bus.close()
-    except Exception as e:
-        bus.close()
-        raise RuntimeError("Unable to communicate with 4relind with exception " + str(e))
+    hwAdd, val = __ident(bus, stack)
+    bus.close()
     val = __IOToOpto(val)
     val = val & (1 << (channel - 1))
     if val == 0:
@@ -169,16 +141,8 @@ def get_opto(stack, channel):
 
 
 def get_opto_all(stack):
-    if stack < 0 or stack > 7:
-        raise ValueError('Invalid stack level')
     bus = smbus.SMBus(1)
-    st = stack #for hw versions less than 1.1 (stack & 0x02) + (0x01 & (stack >> 2)) + (0x04 & (stack << 2))
-    stack = 0x07 ^ st
-    try:
-        val = __check(bus, DEVICE_ADDRESS + stack)
-        bus.close()
-    except Exception as e:
-        bus.close()
-        raise RuntimeError("Unable to communicate with 4relind with exception " + str(e))
+    hwAdd, val = __ident(bus, stack)
+    bus.close()
     val = __IOToOpto(val)
     return val
