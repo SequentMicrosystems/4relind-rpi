@@ -18,11 +18,15 @@
 #include "thread.h"
 
 #define VERSION_BASE	(int)1
-#define VERSION_MAJOR	(int)0
+#define VERSION_MAJOR	(int)1
 #define VERSION_MINOR	(int)0
 
 #define UNUSED(X) (void)X      /* To avoid gcc/g++ warnings */
 #define CMD_ARRAY_SIZE	8
+#define CARD_TYPE_IO_EXP 0
+#define CARD_TYPE_CPU 1
+
+uint8_t gCard = CARD_TYPE_IO_EXP;
 
 const u8 relayMaskRemap[RELAY_CH_NR_MAX] =
 {
@@ -52,7 +56,7 @@ const int inChRemap[IN_CH_NR_MAX] =
 	0};
 
 int relayChSet(int dev, u8 channel, OutStateEnumType state);
-int relayChGet(int dev, u8 channel, OutStateEnumType* state);
+int relayChGet(int dev, u8 channel, OutStateEnumType *state);
 u8 relayToIO(u8 relay);
 u8 IOToRelay(u8 io);
 u8 IOToIn(u8 io);
@@ -79,7 +83,7 @@ const CliCmdType CMD_VERSION =
 	"",
 	"\tExample:        4relind -v  Display the version number\n"};
 
-static void doWarranty(int argc, char* argv[]);
+static void doWarranty(int argc, char *argv[]);
 const CliCmdType CMD_WAR =
 {
 	"-warranty",
@@ -134,8 +138,7 @@ const CliCmdType CMD_IN_READ =
 	"\tUsage:       4relind <id> inread\n",
 	"\tExample:     4relind 0 inread 2; Read Status of Input #2 on Board #0\n"};
 
-
-static void doTest(int argc, char* argv[]);
+static void doTest(int argc, char *argv[]);
 const CliCmdType CMD_TEST =
 {
 	"test",
@@ -221,26 +224,48 @@ int relayChSet(int dev, u8 channel, OutStateEnumType state)
 {
 	int resp;
 	u8 buff[2];
+	u8 add = RELAY8_INPORT_REG_ADD;
 
 	if ( (channel < CHANNEL_NR_MIN) || (channel > RELAY_CH_NR_MAX))
 	{
 		printf("Invalid relay nr!\n");
 		return ERROR;
 	}
-	if (FAIL == i2cMem8Read(dev, RELAY8_INPORT_REG_ADD, buff, 1))
+	if (gCard == CARD_TYPE_CPU)
+	{
+		add = I2C_MEM_RELAY_VAL;
+	}
+	if (FAIL == i2cMem8Read(dev, add, buff, 1))
 	{
 		return FAIL;
 	}
+	add = RELAY8_OUTPORT_REG_ADD;
 
 	switch (state)
 	{
 	case OFF:
-		buff[0] &= ~ (1 << relayChRemap[channel - 1]);
-		resp = i2cMem8Write(dev, RELAY8_OUTPORT_REG_ADD, buff, 1);
+		if (gCard == CARD_TYPE_CPU)
+		{
+			buff[0] &= ~ (1 << (channel - 1));
+			add = I2C_MEM_RELAY_VAL;
+		}
+		else
+		{
+			buff[0] &= ~ (1 << relayChRemap[channel - 1]);
+		}
+		resp = i2cMem8Write(dev, add, buff, 1);
 		break;
 	case ON:
-		buff[0] |= 1 << relayChRemap[channel - 1];
-		resp = i2cMem8Write(dev, RELAY8_OUTPORT_REG_ADD, buff, 1);
+		if (gCard == CARD_TYPE_CPU)
+		{
+			buff[0] |= 1 << (channel - 1);
+			add = I2C_MEM_RELAY_VAL;
+		}
+		else
+		{
+			buff[0] |= 1 << relayChRemap[channel - 1];
+		}
+		resp = i2cMem8Write(dev, add, buff, 1);
 		break;
 	default:
 		printf("Invalid relay state!\n");
@@ -250,9 +275,11 @@ int relayChSet(int dev, u8 channel, OutStateEnumType state)
 	return resp;
 }
 
-int relayChGet(int dev, u8 channel, OutStateEnumType* state)
+int relayChGet(int dev, u8 channel, OutStateEnumType *state)
 {
 	u8 buff[2];
+	u8 add = RELAY8_INPORT_REG_ADD;
+	u8 mask = (u8)1 << relayChRemap[channel - 1];
 
 	if (NULL == state)
 	{
@@ -264,13 +291,18 @@ int relayChGet(int dev, u8 channel, OutStateEnumType* state)
 		printf("Invalid relay nr!\n");
 		return ERROR;
 	}
+	if (gCard == CARD_TYPE_CPU)
+	{
+		add = I2C_MEM_RELAY_VAL;
+		mask = (u8)1 << (channel - 1);
+	}
 
-	if (FAIL == i2cMem8Read(dev, RELAY8_INPORT_REG_ADD, buff, 1))
+	if (FAIL == i2cMem8Read(dev, add, buff, 1))
 	{
 		return ERROR;
 	}
 
-	if (buff[0] & (1 << relayChRemap[channel - 1]))
+	if (buff[0] & mask)
 	{
 		*state = ON;
 	}
@@ -284,31 +316,53 @@ int relayChGet(int dev, u8 channel, OutStateEnumType* state)
 int relaySet(int dev, int val)
 {
 	u8 buff[2];
+	u8 add = RELAY8_OUTPORT_REG_ADD;
 
-	buff[0] = relayToIO(0xff & val);
+	if (gCard == CARD_TYPE_CPU)
+	{
+		buff[0] = 0x0f & val;
+		add = I2C_MEM_RELAY_VAL;
+	}
+	else
+	{
+		buff[0] = relayToIO(0xff & val);
+	}
 
-	return i2cMem8Write(dev, RELAY8_OUTPORT_REG_ADD, buff, 1);
+	return i2cMem8Write(dev, add, buff, 1);
 }
 
-int relayGet(int dev, int* val)
+int relayGet(int dev, int *val)
 {
 	u8 buff[2];
+	u8 add = RELAY8_OUTPORT_REG_ADD;
 
 	if (NULL == val)
 	{
 		return ERROR;
 	}
-	if (FAIL == i2cMem8Read(dev, RELAY8_INPORT_REG_ADD, buff, 1))
+	if (gCard == CARD_TYPE_CPU)
+	{
+		add = I2C_MEM_RELAY_VAL;
+	}
+	if (FAIL == i2cMem8Read(dev, add, buff, 1))
 	{
 		return ERROR;
 	}
-	*val = IOToRelay(buff[0]);
+	if (gCard == CARD_TYPE_CPU)
+	{
+		*val = buff[0];
+	}
+	else
+	{
+		*val = IOToRelay(buff[0]);
+	}
 	return OK;
 }
 
-int inChGet(int dev, u8 channel, OutStateEnumType* state)
+int inChGet(int dev, u8 channel, OutStateEnumType *state)
 {
 	u8 buff[2];
+	u8 add = RELAY8_INPORT_REG_ADD;
 
 	if (NULL == state)
 	{
@@ -317,42 +371,70 @@ int inChGet(int dev, u8 channel, OutStateEnumType* state)
 
 	if ( (channel < CHANNEL_NR_MIN) || (channel > RELAY_CH_NR_MAX))
 	{
-		printf("Invalid relay nr!\n");
+		printf("Invalid input channel nr!\n");
 		return ERROR;
 	}
+	if (gCard == CARD_TYPE_CPU)
+	{
+		add = I2C_MEM_AC_IN;
+	}
 
-	if (FAIL == i2cMem8Read(dev, RELAY8_INPORT_REG_ADD, buff, 1))
+	if (FAIL == i2cMem8Read(dev, add, buff, 1))
 	{
 		return ERROR;
 	}
-
-	if ((buff[0] & (inMaskRemap[channel - 1])) == 0)
+	if (gCard == CARD_TYPE_CPU)
 	{
-		*state = ON;
+		if (buff[0] & (1 << (channel - 1)))
+		{
+			*state = ON;
+		}
+		else
+		{
+			*state = OFF;
+		}
 	}
 	else
 	{
-		*state = OFF;
+		if ( (buff[0] & (inMaskRemap[channel - 1])) == 0)
+		{
+			*state = ON;
+		}
+		else
+		{
+			*state = OFF;
+		}
 	}
 	return OK;
 }
 
-int inGet(int dev, int* val)
+int inGet(int dev, int *val)
 {
 	u8 buff[2];
+	u8 add = RELAY8_INPORT_REG_ADD;
 
 	if (NULL == val)
 	{
 		return ERROR;
 	}
-	if (FAIL == i2cMem8Read(dev, RELAY8_INPORT_REG_ADD, buff, 1))
+	if (gCard == CARD_TYPE_CPU)
+	{
+		add = I2C_MEM_AC_IN;
+	}
+	if (FAIL == i2cMem8Read(dev, add, buff, 1))
 	{
 		return ERROR;
 	}
-	*val = IOToIn(buff[0]);
+	if (gCard == CARD_TYPE_CPU)
+	{
+		*val = buff[0];
+	}
+	else
+	{
+		*val = IOToIn(buff[0]);
+	}
 	return OK;
 }
-
 
 int doBoardInit(int stack)
 {
@@ -366,7 +448,7 @@ int doBoardInit(int stack)
 		printf("Invalid stack level [0..7]!");
 		return ERROR;
 	}
-	st =  stack;//for hw versions less than 1.1 (stack & 0x02) + (0x01 & (stack >> 2)) + (0x04 & (stack << 2));
+	st = stack; //for hw versions less than 1.1 (stack & 0x02) + (0x01 & (stack >> 2)) + (0x04 & (stack << 2));
 	add = (st + RELAY8_HW_I2C_BASE_ADD) ^ 0x07;
 	dev = i2cSetup(add);
 	if (dev == -1)
@@ -383,11 +465,21 @@ int doBoardInit(int stack)
 		}
 		if (ERROR == i2cMem8Read(dev, RELAY8_CFG_REG_ADD, buff, 1))
 		{
-			printf("4-RELAY_PLUS card id %d not detected\n", stack);
-			return ERROR;
+			add = SLAVE_OWN_ADDRESS_BASE + stack;
+			dev = i2cSetup(add);
+			if (dev == -1)
+			{
+				return ERROR;
+			}
+			if (ERROR == i2cMem8Read(dev, I2C_MEM_REVISION_MAJOR_ADD, buff, 1))
+			{
+				printf("Four Relays Four Inputs card did not detected!\n");
+				return ERROR;
+			}
+			gCard = CARD_TYPE_CPU;
 		}
 	}
-	if (buff[0] != 0x0f) //non initialized I/O Expander
+	if ( (buff[0] != 0x0f) && (gCard == CARD_TYPE_CPU)) //non initialized I/O Expander
 	{
 		// make 4 I/O pins input and 4 output 
 		buff[0] = 0x0f;
@@ -703,7 +795,7 @@ static void doList(int argc, char *argv[])
 
 	for (i = 0; i < 8; i++)
 	{
-		st = i;//for hw versions less than 1.1 (0x02 & i) + (0x01 & (i >> 2)) + (0x04 & (i << 2));
+		st = i; //for hw versions less than 1.1 (0x02 & i) + (0x01 & (i >> 2)) + (0x04 & (i << 2));
 		if (boardCheck(RELAY8_HW_I2C_BASE_ADD + st) == OK)
 		{
 			ids[cnt] = i;
@@ -715,6 +807,14 @@ static void doList(int argc, char *argv[])
 			{
 				ids[cnt] = i;
 				cnt++;
+			}
+			else
+			{
+				if (boardCheck((SLAVE_OWN_ADDRESS_BASE + st) ^ 0x07) == OK)
+				{
+					ids[cnt] = i;
+					cnt++;
+				}
 			}
 		}
 	}
@@ -734,7 +834,7 @@ static void doList(int argc, char *argv[])
 /* 
  * Self test for production
  */
-static void doTest(int argc, char* argv[])
+static void doTest(int argc, char *argv[])
 {
 	int dev = 0;
 	int i = 0;
@@ -742,7 +842,7 @@ static void doTest(int argc, char* argv[])
 	int relVal;
 	int valR;
 	int relayResult = 0;
-	FILE* file = NULL;
+	FILE *file = NULL;
 	const u8 relayOrder[RELAY_CH_NR_MAX] =
 	{
 		1,
