@@ -3,9 +3,18 @@ module.exports = function (RED) {
   var I2C = require("i2c-bus");
   const DEFAULT_HW_ADD = 0x38;
   const ALTERNATE_HW_ADD = 0x20;
+  const CPU_TYPE_HW_ADD = 0x0e;
   const INPUT_REG = 0x00;
   const OUT_REG = 0x01;
   const CFG_REG = 0x03;
+  //cpu type card
+  const I2C_MEM_RELAY_VAL = 0x00;
+  const I2C_MEM_AC_IN = 0x04;
+  const SLAVE_OWN_ADDRESS_BASE = 0x0e
+  const CARD_TYPE_IO_EXP = 0
+  const CARD_TYPE_CPU = 1
+  
+  
   const mask = new ArrayBuffer(4);
   mask[0] = 0x80;
   mask[1] = 0x40;
@@ -56,6 +65,7 @@ module.exports = function (RED) {
       }
       var hwAdd = DEFAULT_HW_ADD;
       var found = 1;
+	  var type = CARD_TYPE_IO_EXP;
       if (stack < 0) {
         stack = 0;
       }
@@ -74,9 +84,16 @@ module.exports = function (RED) {
         try {
           direction = node.port.readByteSync(hwAdd, CFG_REG);
         } catch (err) {
-          found = 0;
-          this.error(err, msg);
-        }
+			hwAdd = SLAVE_OWN_ADDRESS_BASE;
+			hwAdd += stack;
+			type = CARD_TYPE_CPU;
+			try {
+				direction = node.port.readByteSync(hwAdd, I2C_MEM_RELAY_VAL);
+			}catch (err){
+			found = 0;
+			this.error(err, msg);
+			}
+		}
       }
 
       if (1 == found) {
@@ -93,13 +110,17 @@ module.exports = function (RED) {
               msg
             );
           }
-          if (direction != 0x0f) {
+          if (direction != 0x0f && type == CARD_TYPE_IO_EXP) {
             node.port.writeByteSync(hwAdd, OUT_REG, 0x00);
             node.port.writeByteSync(hwAdd, CFG_REG, 0x0f);
             //node.log('First update direction');
           }
           var relayVal = 0;
-          relayVal = node.port.readByteSync(hwAdd, OUT_REG);
+		  if(type == CARD_TYPE_IO_EXP){
+			relayVal = node.port.readByteSync(hwAdd, OUT_REG);
+		  } else {
+			  relayVal = direction;
+		  }
           //node.log('Relays ' + String(relayVal));
           if (relay < 0) {
             relay = 0;
@@ -111,29 +132,41 @@ module.exports = function (RED) {
             if (isNaN(myPayload)) {
               //error message
             } else {
-              var i = 0;
-              var newRelayVal = 0;
-              for (i = 0; i < 4; i++) {
-                if (((1 << i) & myPayload) != 0) {
-                  newRelayVal |= mask[i];
-                }
-              }
+				if(type == CARD_TYPE_IO_EXP){  
+				  var i = 0;
+				  var newRelayVal = 0;
+				  for (i = 0; i < 4; i++) {
+				    if (((1 << i) & myPayload) != 0) {
+					    newRelayVal |= mask[i];
+					  }
+				    }
+			    } else{
+				  newRelayVal = 0x0f & myPayload;
+			    }
               relayVal = newRelayVal;
-            }
-          } else {
+              }
+          } else { 
             relay -= 1; //zero based
+			var tempMask = mask[relay];
+			if(type == CARD_TYPE_CPU){
+				tempMask = 1 << relay;
+			}
             if (
               myPayload == null ||
               myPayload == false ||
               myPayload == 0 ||
               myPayload == "off"
             ) {
-              relayVal &= ~mask[relay];
+              relayVal &= ~tempMask;
             } else {
-              relayVal |= mask[relay];
+              relayVal |= tempMask;
             }
           }
-          node.port.writeByte(hwAdd, OUT_REG, relayVal, function (err) {
+		  var regAdd = OUT_REG;
+		  if(type == CARD_TYPE_CPU){
+			  regAdd = I2C_MEM_RELAY_VAL;
+		  }
+          node.port.writeByte(hwAdd, regAdd, relayVal, function (err) {
             if (err) {
               node.error(err, msg);
             } else {
@@ -190,6 +223,7 @@ module.exports = function (RED) {
       }
       var hwAdd = DEFAULT_HW_ADD;
       var found = 1;
+	  var type = CARD_TYPE_IO_EXP;
       if (stack < 0) {
         stack = 0;
       }
@@ -208,9 +242,16 @@ module.exports = function (RED) {
         try {
           direction = node.port.readByteSync(hwAdd, CFG_REG);
         } catch (err) {
-          found = 0;
-          this.error(err, msg);
-        }
+          hwAdd = SLAVE_OWN_ADDRESS_BASE;
+		  hwAdd += stack;
+		  type = CARD_TYPE_CPU;
+		  try {
+			direction = node.port.readByteSync(hwAdd, I2C_MEM_RELAY_VAL );
+		  }catch (err){
+		  found = 0;
+		  this.error(err, msg);
+		  }
+		}
       }
 
       if (1 == found) {
@@ -228,12 +269,12 @@ module.exports = function (RED) {
             );
           }
 
-          if (direction != 0x0f) {
+          if (direction != 0x0f && type == CARD_TYPE_IO_EXP) {
             node.port.writeByteSync(hwAdd, OUT_REG, 0x00);
             node.port.writeByteSync(hwAdd, CFG_REG, 0x0f);
           }
-          var relayVal = 0;
-          relayVal = node.port.readByteSync(hwAdd, OUT_REG);
+          var relayVal = direction;
+		  if(type == CARD_TYPE_IO_EXP) relayVal = node.port.readByteSync(hwAdd, OUT_REG);
           if (relay < 0) {
             relay = 0;
           }
@@ -242,16 +283,20 @@ module.exports = function (RED) {
           }
           if (relay == 0) {
             var i = 0;
-            var newRelayVal = 0;
-            for (i = 0; i < 4; i++) {
-              if ((mask[i] & relayVal) != 0) {
-                newRelayVal |= 1 << i;
-              }
-            }
+            var newRelayVal = relayVal;
+			if(type == CARD_TYPE_IO_EXP){
+              for (i = 0; i < 4; i++) {
+                if ((mask[i] & relayVal) != 0) {
+                  newRelayVal |= 1 << i;
+                }
+              }  
+			}
             msg.payload = newRelayVal;
           } else {
             relay -= 1; //zero based
-            if (relayVal & mask[relay]) {
+			var tempMask = 1<< relay;
+			if(type == CARD_TYPE_IO_EXP) rempMask = mask[relay];
+            if (relayVal & tempMask) {
               msg.payload = 1;
             } else {
               msg.payload = 0;
@@ -309,6 +354,7 @@ module.exports = function (RED) {
       }
       var hwAdd = DEFAULT_HW_ADD;
       var found = 1;
+	  var type = CARD_TYPE_IO_EXP;
       if (stack < 0) {
         stack = 0;
       }
@@ -327,8 +373,15 @@ module.exports = function (RED) {
         try {
           direction = node.port.readByteSync(hwAdd, CFG_REG);
         } catch (err) {
-          found = 0;
-          this.error(err, msg);
+          hwAdd = SLAVE_OWN_ADDRESS_BASE;
+		  hwAdd += stack;
+		  type = CARD_TYPE_CPU;
+		  try {
+			direction = node.port.readByteSync(hwAdd, I2C_MEM_AC_IN );
+		  }catch (err){
+		  found = 0;
+		  this.error(err, msg);
+		  }
         }
       }
 
@@ -347,12 +400,16 @@ module.exports = function (RED) {
             );
           }
 
-          if (direction != 0x0f) {
+          if (direction != 0x0f && type == CARD_TYPE_IO_EXP) {
             node.port.writeByteSync(hwAdd, OUT_REG, 0x00);
             node.port.writeByteSync(hwAdd, CFG_REG, 0x0f);
           }
           var relayVal = 0;
-          relayVal = node.port.readByteSync(hwAdd, INPUT_REG);
+		  if(type == CARD_TYPE_IO_EXP){
+			relayVal = node.port.readByteSync(hwAdd, INPUT_REG);
+		  } else{
+			relayVal = direction;
+		  }
           if (channel < 0) {
             channel = 0;
           }
@@ -362,20 +419,33 @@ module.exports = function (RED) {
           if (channel == 0) {
             var i = 0;
             var newRelayVal = 0;
-            for (i = 0; i < 4; i++) {
-              if ((inMask[i] & relayVal) == 0) {
+			
+            if(type == CARD_TYPE_IO_EXP){
+			  for (i = 0; i < 4; i++) {
+				if ((inMask[i] & relayVal) == 0) {
                 // inverted input
-                newRelayVal |= 1 << i;
+				  newRelayVal |= 1 << i;
+				}
               }
-            }
+			}else{
+				newRelayVal = relayVal;
+			}
             msg.payload = newRelayVal;
           } else {
             channel -= 1; //zero based
-            if (relayVal & inMask[channel]) {
-              msg.payload = 0;
-            } else {
-              msg.payload = 1;
-            }
+			if(type == CARD_TYPE_CPU) {				
+			  if (relayVal & (1 << channel) ){
+                msg.payload = 1;
+              } else {
+                msg.payload = 0;
+              }
+			}else{
+              if (relayVal & inMask[channel]) {
+                msg.payload = 0;
+              } else {
+                msg.payload = 1;
+              }
+			}
           }
           node.send(msg);
         } catch (err) {
