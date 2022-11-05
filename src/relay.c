@@ -19,12 +19,14 @@
 
 #define VERSION_BASE	(int)1
 #define VERSION_MAJOR	(int)1
-#define VERSION_MINOR	(int)0
+#define VERSION_MINOR	(int)1
 
 #define UNUSED(X) (void)X      /* To avoid gcc/g++ warnings */
 #define CMD_ARRAY_SIZE	8
 #define CARD_TYPE_IO_EXP 0
 #define CARD_TYPE_CPU 1
+
+//#define CARD_TYPE_DEBUG 
 
 uint8_t gCard = CARD_TYPE_IO_EXP;
 
@@ -477,9 +479,12 @@ int doBoardInit(int stack)
 				return ERROR;
 			}
 			gCard = CARD_TYPE_CPU;
+#ifdef CARD_TYPE_DEBUG
+			printf("CPU type card found");
+#endif
 		}
 	}
-	if ( (buff[0] != 0x0f) && (gCard == CARD_TYPE_CPU)) //non initialized I/O Expander
+	if ( (buff[0] != 0x0f) && (gCard != CARD_TYPE_CPU)) //non initialized I/O Expander
 	{
 		// make 4 I/O pins input and 4 output 
 		buff[0] = 0x0f;
