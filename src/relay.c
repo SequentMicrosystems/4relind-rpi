@@ -26,36 +26,16 @@
 #define CARD_TYPE_IO_EXP 0
 #define CARD_TYPE_CPU 1
 
-//#define CARD_TYPE_DEBUG 
+//#define CARD_TYPE_DEBUG
 
 uint8_t gCard = CARD_TYPE_IO_EXP;
 
-const u8 relayMaskRemap[RELAY_CH_NR_MAX] =
-{
-	0x80,
-	0x40,
-	0x20,
-	0x10};
-const int relayChRemap[RELAY_CH_NR_MAX] =
-{
-	7,
-	6,
-	5,
-	4};
+const u8 relayMaskRemap[RELAY_CH_NR_MAX] = {0x80, 0x40, 0x20, 0x10};
+const int relayChRemap[RELAY_CH_NR_MAX] = {7, 6, 5, 4};
 
-const u8 inMaskRemap[IN_CH_NR_MAX] =
-{
-	0x08,
-	0x04,
-	0x02,
-	0x01};
+const u8 inMaskRemap[IN_CH_NR_MAX] = {0x08, 0x04, 0x02, 0x01};
 
-const int inChRemap[IN_CH_NR_MAX] =
-{
-	3,
-	2,
-	1,
-	0};
+const int inChRemap[IN_CH_NR_MAX] = {3, 2, 1, 0};
 
 int relayChSet(int dev, u8 channel, OutStateEnumType state);
 int relayChGet(int dev, u8 channel, OutStateEnumType *state);
@@ -65,91 +45,56 @@ u8 IOToIn(u8 io);
 
 static void doHelp(int argc, char *argv[]);
 const CliCmdType CMD_HELP =
-	{
-		"-h",
-		1,
-		&doHelp,
+	{"-h", 1, &doHelp,
 		"\t-h          Display the list of command options or one command option details\n",
 		"\tUsage:      4relind -h    Display command options list\n",
 		"\tUsage:      4relind -h <param>   Display help for <param> command option\n",
 		"\tExample:    4relind -h write    Display help for \"write\" command option\n"};
 
 static void doVersion(int argc, char *argv[]);
-const CliCmdType CMD_VERSION =
-{
-	"-v",
-	1,
-	&doVersion,
+const CliCmdType CMD_VERSION = {"-v", 1, &doVersion,
 	"\t-v              Display the version number\n",
-	"\tUsage:          4relind -v\n",
-	"",
+	"\tUsage:          4relind -v\n", "",
 	"\tExample:        4relind -v  Display the version number\n"};
 
 static void doWarranty(int argc, char *argv[]);
-const CliCmdType CMD_WAR =
-{
-	"-warranty",
-	1,
-	&doWarranty,
+const CliCmdType CMD_WAR = {"-warranty", 1, &doWarranty,
 	"\t-warranty       Display the warranty\n",
-	"\tUsage:          4relind -warranty\n",
-	"",
+	"\tUsage:          4relind -warranty\n", "",
 	"\tExample:        4relind -warranty  Display the warranty text\n"};
 
 static void doList(int argc, char *argv[]);
 const CliCmdType CMD_LIST =
-	{
-		"-list",
-		1,
-		&doList,
+	{"-list", 1, &doList,
 		"\t-list:       List all 4relind boards connected,\n\treturn       nr of boards and stack level for every board\n",
-		"\tUsage:       4relind -list\n",
-		"",
+		"\tUsage:       4relind -list\n", "",
 		"\tExample:     4relind -list display: 1,0 \n"};
 
 static void doRelayWrite(int argc, char *argv[]);
-const CliCmdType CMD_WRITE =
-{
-	"write",
-	2,
-	&doRelayWrite,
+const CliCmdType CMD_WRITE = {"write", 2, &doRelayWrite,
 	"\twrite:       Set relays On/Off\n",
 	"\tUsage:       4relind <id> write <channel> <on/off>\n",
 	"\tUsage:       4relind <id> write <value>\n",
 	"\tExample:     4relind 0 write 2 On; Set Relay #2 on Board #0 On\n"};
 
 static void doRelayRead(int argc, char *argv[]);
-const CliCmdType CMD_READ =
-{
-	"read",
-	2,
-	&doRelayRead,
+const CliCmdType CMD_READ = {"read", 2, &doRelayRead,
 	"\tread:        Read relays status\n",
 	"\tUsage:       4relind <id> read <channel>\n",
 	"\tUsage:       4relind <id> read\n",
 	"\tExample:     4relind 0 read 2; Read Status of Relay #2 on Board #0\n"};
 
 static void doInRead(int argc, char *argv[]);
-const CliCmdType CMD_IN_READ =
-{
-	"inread",
-	2,
-	&doInRead,
+const CliCmdType CMD_IN_READ = {"inread", 2, &doInRead,
 	"\tinread:        Read inputs status\n",
 	"\tUsage:       4relind <id> inread <channel>\n",
 	"\tUsage:       4relind <id> inread\n",
 	"\tExample:     4relind 0 inread 2; Read Status of Input #2 on Board #0\n"};
 
 static void doTest(int argc, char *argv[]);
-const CliCmdType CMD_TEST =
-{
-	"test",
-	2,
-	&doTest,
-	"\ttest:        Turn ON and OFF the relays until press a key\n",
-	"",
-	"\tUsage:       4relind <id> test\n",
-	"\tExample:     4relind 0 test\n"};
+const CliCmdType CMD_TEST = {"test", 2, &doTest,
+	"\ttest:        Turn ON and OFF the relays until press a key\n", "",
+	"\tUsage:       4relind <id> test\n", "\tExample:     4relind 0 test\n"};
 
 CliCmdType gCmdArray[CMD_ARRAY_SIZE];
 
@@ -239,6 +184,7 @@ int relayChSet(int dev, u8 channel, OutStateEnumType state)
 	}
 	if (FAIL == i2cMem8Read(dev, add, buff, 1))
 	{
+		printf("I2C read Fail!\n");
 		return FAIL;
 	}
 	add = RELAY8_OUTPORT_REG_ADD;
@@ -274,6 +220,10 @@ int relayChSet(int dev, u8 channel, OutStateEnumType state)
 		return ERROR;
 		break;
 	}
+	if (resp != OK)
+	{
+		printf("I2C write fail!\n");
+	}
 	return resp;
 }
 
@@ -301,6 +251,7 @@ int relayChGet(int dev, u8 channel, OutStateEnumType *state)
 
 	if (FAIL == i2cMem8Read(dev, add, buff, 1))
 	{
+		printf("I2C read Fail!\n");
 		return ERROR;
 	}
 
@@ -319,6 +270,7 @@ int relaySet(int dev, int val)
 {
 	u8 buff[2];
 	u8 add = RELAY8_OUTPORT_REG_ADD;
+	int ret = 0;
 
 	if (gCard == CARD_TYPE_CPU)
 	{
@@ -329,8 +281,12 @@ int relaySet(int dev, int val)
 	{
 		buff[0] = relayToIO(0xff & val);
 	}
-
-	return i2cMem8Write(dev, add, buff, 1);
+	ret = i2cMem8Write(dev, add, buff, 1);
+	if (ret != OK)
+	{
+		printf("I2C write fail!\n");
+	}
+	return ret;
 }
 
 int relayGet(int dev, int *val)
@@ -348,6 +304,7 @@ int relayGet(int dev, int *val)
 	}
 	if (FAIL == i2cMem8Read(dev, add, buff, 1))
 	{
+		printf("I2C read Fail!\n");
 		return ERROR;
 	}
 	if (gCard == CARD_TYPE_CPU)
@@ -815,7 +772,7 @@ static void doList(int argc, char *argv[])
 			}
 			else
 			{
-				if (boardCheck((SLAVE_OWN_ADDRESS_BASE + st) ^ 0x07) == OK)
+				if (boardCheck( (SLAVE_OWN_ADDRESS_BASE + st) ^ 0x07) == OK)
 				{
 					ids[cnt] = i;
 					cnt++;
@@ -848,12 +805,7 @@ static void doTest(int argc, char *argv[])
 	int valR;
 	int relayResult = 0;
 	FILE *file = NULL;
-	const u8 relayOrder[RELAY_CH_NR_MAX] =
-	{
-		1,
-		2,
-		3,
-		4};
+	const u8 relayOrder[RELAY_CH_NR_MAX] = {1, 2, 3, 4};
 
 	dev = doBoardInit(atoi(argv[1]));
 	if (dev <= 0)

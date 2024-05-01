@@ -1,44 +1,13 @@
-[![4relind-rpi](../readmeres/sequent.jpg)](https://sequentmicrosystems.com)
+[![4relayind-rpi](../../readmeres/sequent.jpg)](https://sequentmicrosystems.com)
 
-# lib4relind
+# SM4relind
 
-This is the python library to control the [Four Relays four Inputs 8-Layer Stackable Card for Raspberry Pi](https://sequentmicrosystems.com/collections/all-io-cards/products/raspberry-pi-relays-heavy-duty-hat).
+This is the python library to control the [4-RELAYS Heavy Duty Stackable Card for Raspberry Pi](https://sequentmicrosystems.com/product/raspberry-pi-relays-heavy-duty-hat/).
 
 ## Install
 
 ```bash
-~$ sudo apt-get update
-~$ sudo apt-get install build-essential python-pip python-dev python-smbus git
-~$ git clone https://github.com/SequentMicrosystems/4relind-rpi.git
-~$ cd 4relind-rpi/python/4relind/
-~/4relind-rpi/python/4relind$ sudo python setup.py install
-```
-
-If you use python3:
-```bash
-~$ sudo apt-get update
-~$ sudo apt-get install build-essential python3-pip python3-dev python3-smbus git
-~$ git clone https://github.com/SequentMicrosystems/4relind-rpi.git
-~$ cd 4relind-rpi/python/4relind/
-~/4relind-rpi/python/4relind$ sudo python3 setup.py install
-```
-
-
-## Update
-
-```bash
-~$ cd 4relind-rpi/
-~/4relind-rpi$ git pull
-~$ cd 4relind-rpi/python/4relind/
-~/4relind-rpi/python/4relind$ sudo python setup.py install
-```
-
-If you use python3:
-```bash
-~$ cd 4relind-rpi/
-~/4relind-rpi$ git pull
-~$ cd 4relind-rpi/python/4relind/
-~/4relind-rpi/python/4relind$ sudo python3 setup.py install
+pip install SM4relind
 ```
 
 ## Usage 
