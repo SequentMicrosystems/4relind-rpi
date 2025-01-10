@@ -2,3 +2,7 @@
 python/build/
 python/dist/
 python/SM4relind.egg-info/
+4relind
+src/comm.o
+src/relay.o
+src/thread.o
