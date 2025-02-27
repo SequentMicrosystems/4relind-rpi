@@ -1,4 +1,4 @@
 # Python build dirs
 python/build/
 python/dist/
-python/SM4relind.egg-info/
+python/*.egg-info/
