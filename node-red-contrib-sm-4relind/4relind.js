@@ -295,7 +295,7 @@ module.exports = function (RED) {
           } else {
             relay -= 1; //zero based
 			var tempMask = 1<< relay;
-			if(type == CARD_TYPE_IO_EXP) rempMask = mask[relay];
+			if(type == CARD_TYPE_IO_EXP) tempMask = mask[relay];
             if (relayVal & tempMask) {
               msg.payload = 1;
             } else {

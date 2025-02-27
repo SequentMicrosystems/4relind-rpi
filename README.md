@@ -3,7 +3,7 @@
 # 4relind-rpi
 
 
-This is the command to control [Four Relays four Inputs 8-Layer Stackable Card for Raspberry Pi](https://thepihut.com/products/four-relays-four-inputs-8-layer-stackable-card-for-raspberry-pi)
+This is the command to control [Four Relays four Inputs 8-Layer Stackable Card for Raspberry Pi](https://sequentmicrosystems.com/products/four-relays-four-inputs-for-raspberry-pi)
 
 Don't forget to enable I2C communication:
 ```bash

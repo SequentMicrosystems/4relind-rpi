@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="sm4relind",
-    version="1.0.4",
+    version="1.0.5",
     author="Sequent Microsystems",
     author_email="olcitu@gmail.com",
     description="A set of functions to control Sequent Microsystems 4-Relay board",

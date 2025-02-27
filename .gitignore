@@ -2,3 +2,7 @@
 python/build/
 python/dist/
 python/*.egg-info/
+
+# C build
+4relind
+src/*.o
