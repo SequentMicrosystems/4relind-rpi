@@ -6,7 +6,7 @@ This is the node-red node to control Sequent Microsystems [Four Relays four Inpu
 
 ## Manual Install
 
-Clone or update the repository, follow the instrutions fron the [first page.](https://github.com/SequentMicrosystems/4relind-rpi)
+Clone or update the repository, follow the instrutions from the [first page.](https://github.com/SequentMicrosystems/4relind-rpi)
 
 In your node-red user directory, tipicaly ~/.node-red,
 
