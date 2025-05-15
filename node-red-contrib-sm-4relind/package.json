@@ -1,9 +1,9 @@
 {
   "name": "node-red-contrib-sm-4relind",
   "version": "1.0.4",
-  "bundleDependencies": false,
+  "bundleDependencies": [],
   "dependencies": {
-    "i2c-bus": "^5.2.0"
+    "i2c-bus": "^5.2.3"
   },
   "deprecated": false,
   "description": "A Node-RED node to control Sequent Microsystems 4Relays-4Inputs Card",
@@ -13,12 +13,12 @@
   },
   "author": "Sequent Microsystems",
   "license": "MIT",
-  "node-red" : {
+  "node-red": {
     "nodes": {
-        "4relind": "4relind.js"
-      }
+      "4relind": "4relind.js"
+    }
   },
-   "repository": {
+  "repository": {
     "type": "git",
     "url": "https://github.com/SequentMicrosystems/4relind-rpi/tree/master/node-red-contrib-sm-4relind"
   },

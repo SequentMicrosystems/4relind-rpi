@@ -6,3 +6,6 @@ python/*.egg-info/
 # C build
 4relind
 src/*.o
+
+
+node_modules/

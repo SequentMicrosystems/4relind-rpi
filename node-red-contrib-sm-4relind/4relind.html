@@ -269,3 +269,279 @@
         }
     });
 </script>
+
+<!-- Frequency Read Node -->
+<script type="text/html" data-template-name="4relindfrequency">
+    <div class="form-row">
+        <label for="node-input-stack"><i class="fa fa-address-card-o""></i> Board Stack Level</label>
+        <input id="node-input-stack" class="4relindfrequency-in-stack" placeholder="[msg.stack]" min=0 max=7 style="width:100px; height:16px;">
+    </div>
+    
+    <div class="form-row">
+        <label for="node-input-channel"><i class="fa fa-empire"></i> Channel Number</label>
+        <input id="node-input-channel" class="4relindfrequency-in-channel" placeholder="[msg.channel]" min=1 max=4 style="width:100px; height:16px;">
+    </div>
+    <div class="form-row">
+        <label for="node-input-payload"><i class="fa fa-envelope"></i> Payload</span></label>
+        <input type="text" id="node-input-payload" style="width:70%">
+        <input type="hidden" id="node-input-payloadType">
+    </div>
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+</script>
+ 
+<script type="text/html" data-help-name="4relindfrequency">
+    <p>Provides a connection to a Sequent Microsystems 4Relays-4Inputs card.</p>
+    <p>Each message received by the node generates an output message with <code>msg.payload</code> containing the frequency value (in Hz) of the specified input channel.</p>
+    <p>You can specify the card stack level in the edit dialog box or programmatically with the input message <code>msg.stack</code></p>
+    <p>You can specify the channel number [1..4] in the edit dialog box or programmatically with the input message <code>msg.channel</code></p>
+</script>
+
+<script type="text/javascript">
+    RED.nodes.registerType('4relindfrequency', {
+        category: 'Sequent Microsystems',
+        defaults: {
+            name: {value:""},
+            stack: {value:"0"},
+            channel: {value:"1"},
+            payload: {value:"payload", required:false, validate: RED.validators.typedInput("payloadType")},
+            payloadType: {value:"msg"},
+        },
+        color:"#7a9da6",
+        inputs:1,
+        outputs:1,
+        icon: "optocoupler.png",
+        align: "left",
+        label: function() { return this.name||'4relindfrequency'; },
+        labelStyle: function() { return this.name?"node_label_italic":"";},
+        oneditprepare: function() {
+            if (this.payloadType == null) {
+                this.payloadType = "msg";
+            } else if (this.payloadType === 'string' ) {
+                this.payloadType = "str";
+            }
+
+           
+            if (this.stack === undefined) {
+                $("#node-input-stack").val(1);
+            }
+            $("#node-input-stack").spinner({
+                min:0,
+                max:7
+            });
+            if (this.channel === undefined) {
+                $("#node-input-channel").val(1);
+            }
+            $("#node-input-channel").spinner({
+                min:1,
+                max:4
+            }); 
+            $("#node-input-payload").typedInput({
+                default: 'msg',
+                typeField: $("#node-input-payloadType"),
+                types:['msg','flow','global','str','num','bool','json','bin']
+            });
+            $("#node-input-payload").typedInput('type',this.payloadType);
+            $("#node-input-payloadType").val(this.payloadType);
+            if ($("#node-input-payload").typedInput('type') === 'msg' &&
+                $("#node-input-payload").typedInput('value') === ''
+            ) {
+                $("#node-input-payload").typedInput('value','payload');
+            }
+            
+            $("#node-input-payload").on('change',function() {
+                if ($("#node-input-payload").typedInput('type') === 'msg' &&
+                    $("#node-input-payload").typedInput('value') === ''
+                ) {
+                    $("#node-input-payload").typedInput('value','payload');
+                }
+            });
+        }
+    });
+</script>
+
+<!-- PWM Fill Read Node -->
+<script type="text/html" data-template-name="4relindpwmfill">
+    <div class="form-row">
+        <label for="node-input-stack"><i class="fa fa-address-card-o""></i> Board Stack Level</label>
+        <input id="node-input-stack" class="4relindpwmfill-in-stack" placeholder="[msg.stack]" min=0 max=7 style="width:100px; height:16px;">
+    </div>
+    
+    <div class="form-row">
+        <label for="node-input-channel"><i class="fa fa-empire"></i> Channel Number</label>
+        <input id="node-input-channel" class="4relindpwmfill-in-channel" placeholder="[msg.channel]" min=1 max=4 style="width:100px; height:16px;">
+    </div>
+    <div class="form-row">
+        <label for="node-input-payload"><i class="fa fa-envelope"></i> Payload</span></label>
+        <input type="text" id="node-input-payload" style="width:70%">
+        <input type="hidden" id="node-input-payloadType">
+    </div>
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+</script>
+ 
+<script type="text/html" data-help-name="4relindpwmfill">
+    <p>Provides a connection to a Sequent Microsystems 4Relays-4Inputs card.</p>
+    <p>Each message received by the node generates an output message with <code>msg.payload</code> containing the PWM fill percentage (as a decimal value) of the specified input channel.</p>
+    <p>You can specify the card stack level in the edit dialog box or programmatically with the input message <code>msg.stack</code></p>
+    <p>You can specify the channel number [1..4] in the edit dialog box or programmatically with the input message <code>msg.channel</code></p>
+</script>
+
+<script type="text/javascript">
+    RED.nodes.registerType('4relindpwmfill', {
+        category: 'Sequent Microsystems',
+        defaults: {
+            name: {value:""},
+            stack: {value:"0"},
+            channel: {value:"1"},
+            payload: {value:"payload", required:false, validate: RED.validators.typedInput("payloadType")},
+            payloadType: {value:"msg"},
+        },
+        color:"#7a9da6",
+        inputs:1,
+        outputs:1,
+        icon: "optocoupler.png",
+        align: "left",
+        label: function() { return this.name||'4relindpwmfill'; },
+        labelStyle: function() { return this.name?"node_label_italic":"";},
+        oneditprepare: function() {
+            if (this.payloadType == null) {
+                this.payloadType = "msg";
+            } else if (this.payloadType === 'string' ) {
+                this.payloadType = "str";
+            }
+
+           
+            if (this.stack === undefined) {
+                $("#node-input-stack").val(1);
+            }
+            $("#node-input-stack").spinner({
+                min:0,
+                max:7
+            });
+            if (this.channel === undefined) {
+                $("#node-input-channel").val(1);
+            }
+            $("#node-input-channel").spinner({
+                min:1,
+                max:4
+            }); 
+            $("#node-input-payload").typedInput({
+                default: 'msg',
+                typeField: $("#node-input-payloadType"),
+                types:['msg','flow','global','str','num','bool','json','bin']
+            });
+            $("#node-input-payload").typedInput('type',this.payloadType);
+            $("#node-input-payloadType").val(this.payloadType);
+            if ($("#node-input-payload").typedInput('type') === 'msg' &&
+                $("#node-input-payload").typedInput('value') === ''
+            ) {
+                $("#node-input-payload").typedInput('value','payload');
+            }
+            
+            $("#node-input-payload").on('change',function() {
+                if ($("#node-input-payload").typedInput('type') === 'msg' &&
+                    $("#node-input-payload").typedInput('value') === ''
+                ) {
+                    $("#node-input-payload").typedInput('value','payload');
+                }
+            });
+        }
+    });
+</script>
+
+<!-- PPS Read Node -->
+<script type="text/html" data-template-name="4relindpps">
+    <div class="form-row">
+        <label for="node-input-stack"><i class="fa fa-address-card-o""></i> Board Stack Level</label>
+        <input id="node-input-stack" class="4relindpps-in-stack" placeholder="[msg.stack]" min=0 max=7 style="width:100px; height:16px;">
+    </div>
+    
+    <div class="form-row">
+        <label for="node-input-channel"><i class="fa fa-empire"></i> Channel Number</label>
+        <input id="node-input-channel" class="4relindpps-in-channel" placeholder="[msg.channel]" min=1 max=4 style="width:100px; height:16px;">
+    </div>
+    <div class="form-row">
+        <label for="node-input-payload"><i class="fa fa-envelope"></i> Payload</span></label>
+        <input type="text" id="node-input-payload" style="width:70%">
+        <input type="hidden" id="node-input-payloadType">
+    </div>
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+</script>
+ 
+<script type="text/html" data-help-name="4relindpps">
+    <p>Provides a connection to a Sequent Microsystems 4Relays-4Inputs card.</p>
+    <p>Each message received by the node generates an output message with <code>msg.payload</code> containing the pulses per second value of the specified input channel.</p>
+    <p>You can specify the card stack level in the edit dialog box or programmatically with the input message <code>msg.stack</code></p>
+    <p>You can specify the channel number [1..4] in the edit dialog box or programmatically with the input message <code>msg.channel</code></p>
+</script>
+
+<script type="text/javascript">
+    RED.nodes.registerType('4relindpps', {
+        category: 'Sequent Microsystems',
+        defaults: {
+            name: {value:""},
+            stack: {value:"0"},
+            channel: {value:"1"},
+            payload: {value:"payload", required:false, validate: RED.validators.typedInput("payloadType")},
+            payloadType: {value:"msg"},
+        },
+        color:"#7a9da6",
+        inputs:1,
+        outputs:1,
+        icon: "optocoupler.png",
+        align: "left",
+        label: function() { return this.name||'4relindpps'; },
+        labelStyle: function() { return this.name?"node_label_italic":"";},
+        oneditprepare: function() {
+            if (this.payloadType == null) {
+                this.payloadType = "msg";
+            } else if (this.payloadType === 'string' ) {
+                this.payloadType = "str";
+            }
+
+           
+            if (this.stack === undefined) {
+                $("#node-input-stack").val(1);
+            }
+            $("#node-input-stack").spinner({
+                min:0,
+                max:7
+            });
+            if (this.channel === undefined) {
+                $("#node-input-channel").val(1);
+            }
+            $("#node-input-channel").spinner({
+                min:1,
+                max:4
+            }); 
+            $("#node-input-payload").typedInput({
+                default: 'msg',
+                typeField: $("#node-input-payloadType"),
+                types:['msg','flow','global','str','num','bool','json','bin']
+            });
+            $("#node-input-payload").typedInput('type',this.payloadType);
+            $("#node-input-payloadType").val(this.payloadType);
+            if ($("#node-input-payload").typedInput('type') === 'msg' &&
+                $("#node-input-payload").typedInput('value') === ''
+            ) {
+                $("#node-input-payload").typedInput('value','payload');
+            }
+            
+            $("#node-input-payload").on('change',function() {
+                if ($("#node-input-payload").typedInput('type') === 'msg' &&
+                    $("#node-input-payload").typedInput('value') === ''
+                ) {
+                    $("#node-input-payload").typedInput('value','payload');
+                }
+            });
+        }
+    });
+</script>

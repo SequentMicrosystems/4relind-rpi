@@ -459,4 +459,205 @@ module.exports = function (RED) {
     });
   }
   RED.nodes.registerType("4relindin", OptoReadNode);
+
+  const I2C_MEM_IN_FREQUENCY = 53;
+  const I2C_MEM_PWM_IN_FILL = 45;
+  const I2C_MEM_PPS = 29;
+  const FREQ_SIZE_BYTES = 2;
+
+  function FrequencyReadNode(n) {
+    RED.nodes.createNode(this, n);
+    this.stack = parseInt(n.stack);
+    this.channel = parseInt(n.channel);
+    this.payload = n.payload;
+    this.payloadType = n.payloadType;
+    var node = this;
+
+    node.port = I2C.openSync(1);
+    node.on("input", function (msg) {
+      var stack = node.stack;
+      if (isNaN(stack)) stack = msg.stack;
+      stack = parseInt(stack);
+      var channel = node.channel;
+      if (isNaN(channel)) channel = msg.channel;
+      channel = parseInt(channel);
+      
+      if (isNaN(stack + 1)) {
+        this.status({
+          fill: "red",
+          shape: "ring",
+          text: "Stack level (" + stack + ") value is missing or incorrect",
+        });
+        return;
+      } else if (isNaN(channel)) {
+        this.status({
+          fill: "red",
+          shape: "ring",
+          text: "Channel number (" + channel + ") value is missing or incorrect",
+        });
+        return;
+      } else {
+        this.status({});
+      }
+      
+      if (stack < 0) stack = 0;
+      if (stack > 7) stack = 7;
+      if (channel < 1) channel = 1;
+      if (channel > 4) channel = 4;
+
+      var hwAdd = SLAVE_OWN_ADDRESS_BASE + stack;
+      
+      try {
+        var memAddr = I2C_MEM_IN_FREQUENCY + (channel - 1) * FREQ_SIZE_BYTES;
+        
+        var frequency = 0;
+        try {
+          frequency = node.port.readWordSync(hwAdd, memAddr);
+        } catch (err) {
+          node.error("Error reading frequency: " + err.message);
+        }
+        
+        msg.payload = frequency;
+        node.send(msg);
+      } catch (err) {
+        this.error(err, msg);
+      }
+    });
+
+    node.on("close", function () {
+      node.port.closeSync();
+    });
+  }
+  RED.nodes.registerType("4relindfrequency", FrequencyReadNode);
+
+  function PwmFillReadNode(n) {
+    RED.nodes.createNode(this, n);
+    this.stack = parseInt(n.stack);
+    this.channel = parseInt(n.channel);
+    this.payload = n.payload;
+    this.payloadType = n.payloadType;
+    var node = this;
+
+    node.port = I2C.openSync(1);
+    node.on("input", function (msg) {
+      var stack = node.stack;
+      if (isNaN(stack)) stack = msg.stack;
+      stack = parseInt(stack);
+      var channel = node.channel;
+      if (isNaN(channel)) channel = msg.channel;
+      channel = parseInt(channel);
+      
+      if (isNaN(stack + 1)) {
+        this.status({
+          fill: "red",
+          shape: "ring",
+          text: "Stack level (" + stack + ") value is missing or incorrect",
+        });
+        return;
+      } else if (isNaN(channel)) {
+        this.status({
+          fill: "red",
+          shape: "ring",
+          text: "Channel number (" + channel + ") value is missing or incorrect",
+        });
+        return;
+      } else {
+        this.status({});
+      }
+      
+      if (stack < 0) stack = 0;
+      if (stack > 7) stack = 7;
+      if (channel < 1) channel = 1;
+      if (channel > 4) channel = 4;
+
+      var hwAdd = SLAVE_OWN_ADDRESS_BASE + stack;
+      
+      try {
+        var memAddr = I2C_MEM_PWM_IN_FILL + (channel - 1) * FREQ_SIZE_BYTES;
+        
+        var pwmFill = 0;
+        try {
+          var rawValue = node.port.readWordSync(hwAdd, memAddr);
+          pwmFill = rawValue / 100;
+        } catch (err) {
+          node.error("Error reading PWM fill: " + err.message);
+        }
+        
+        msg.payload = pwmFill;
+        node.send(msg);
+      } catch (err) {
+        this.error(err, msg);
+      }
+    });
+
+    node.on("close", function () {
+      node.port.closeSync();
+    });
+  }
+  RED.nodes.registerType("4relindpwmfill", PwmFillReadNode);
+
+  function PpsReadNode(n) {
+    RED.nodes.createNode(this, n);
+    this.stack = parseInt(n.stack);
+    this.channel = parseInt(n.channel);
+    this.payload = n.payload;
+    this.payloadType = n.payloadType;
+    var node = this;
+
+    node.port = I2C.openSync(1);
+    node.on("input", function (msg) {
+      var stack = node.stack;
+      if (isNaN(stack)) stack = msg.stack;
+      stack = parseInt(stack);
+      var channel = node.channel;
+      if (isNaN(channel)) channel = msg.channel;
+      channel = parseInt(channel);
+      
+      if (isNaN(stack + 1)) {
+        this.status({
+          fill: "red",
+          shape: "ring",
+          text: "Stack level (" + stack + ") value is missing or incorrect",
+        });
+        return;
+      } else if (isNaN(channel)) {
+        this.status({
+          fill: "red",
+          shape: "ring",
+          text: "Channel number (" + channel + ") value is missing or incorrect",
+        });
+        return;
+      } else {
+        this.status({});
+      }
+      
+      if (stack < 0) stack = 0;
+      if (stack > 7) stack = 7;
+      if (channel < 1) channel = 1;
+      if (channel > 4) channel = 4;
+
+      var hwAdd = SLAVE_OWN_ADDRESS_BASE + stack;
+      
+      try {
+        var memAddr = I2C_MEM_PPS + (channel - 1) * FREQ_SIZE_BYTES;
+        
+        var pps = 0;
+        try {
+          pps = node.port.readWordSync(hwAdd, memAddr);
+        } catch (err) {
+          node.error("Error reading PPS: " + err.message);
+        }
+        
+        msg.payload = pps;
+        node.send(msg);
+      } catch (err) {
+        this.error(err, msg);
+      }
+    });
+
+    node.on("close", function () {
+      node.port.closeSync();
+    });
+  }
+  RED.nodes.registerType("4relindpps", PpsReadNode);
 };
